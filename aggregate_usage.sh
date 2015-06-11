@@ -9,18 +9,33 @@ aggregate_details () {
 
 }
 
+host (){
+    echo $1 | sed "s/'//g" | sed "s/,//g"
+}
 
-host_details(){
-	local host=$(echo $i | sed "s/'//g" | sed "s/,//g")
-	local total_cpu=$( nova host-describe $(echo $host | sed "s/'//g" | sed "s/,//g") | grep "(total)" | awk '{ print $6 }')
-	local cpus_used_now=$( nova host-describe $(echo $host | sed "s/'//g" | sed "s/,//g") | grep "(used_now)" | awk '{ print $6 }')
-	echo "Host: $(echo $i | sed "s/'//g" | sed "s/,//g")"
-	echo -e "CPU: $cpus_used_now/$total_cpu\n";
+host_cpu(){	
+	local total_cpu=$( nova host-describe $(echo $(host $i) | sed "s/'//g" | sed "s/,//g") | grep "(total)" | awk '{ print $6 }')
+	local cpus_used_now=$( nova host-describe $(echo $(host $i) | sed "s/'//g" | sed "s/,//g") | grep "(used_now)" | awk '{ print $6 }')
+	echo "CPU: $cpus_used_now/$total_cpu";
 	
+}
+
+host_ram(){
+	local total_ram=$( nova host-describe $(echo $(host $i) | sed "s/'//g" | sed "s/,//g") | grep "(total)" | awk '{ print $8 }')	
+	local ram_used_now=$( nova host-describe $(echo $(host $i) | sed "s/'//g" | sed "s/,//g") | grep "(used_now)" | awk '{ print $8 }')	
+	echo "Ram: $(covert_giga $ram_used_now)/$(covert_giga $total_ram)"	
+
+}
+
+covert_giga (){
+	echo $(bc <<< 'scale=2; '$1'/1024')
 }
 
 
 for i in `aggregate_details $1`; do
-      host_details $i;
+      echo "Host: $(echo $i | sed "s/'//g" | sed "s/,//g")"
+      host_cpu $i;
+      host_ram $i;
+      echo ""
 done
 
