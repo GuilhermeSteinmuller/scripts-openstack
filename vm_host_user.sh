@@ -2,7 +2,7 @@
 
 get_user(){
 	user_id=$(nova show $1 | grep "user_id" | awk '{print $4}')
-	echo "$(keystone user-list | grep $user_id | awk '{print $4}')"
+	echo "$(openstack user list | grep $user_id | awk '{print $4}')"
 }
 
 get_vm_name(){
