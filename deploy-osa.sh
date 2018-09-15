@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Clone osa based on the tag 
-git clone -b $1 git clone https://git.openstack.org/openstack/openstack-ansible  /opt/openstack-ansible
+git clone -b $1 https://git.openstack.org/openstack/openstack-ansible 
+
+mv openstack-ansible /opt/
 
 # Change to osa dir
 cd /opt/openstack-ansible
